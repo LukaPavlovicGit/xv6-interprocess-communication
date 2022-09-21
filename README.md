@@ -21,14 +21,14 @@ Additional changes to the xv6 OS:<br/>
     
     -   **int share_mem(char \*name, void \*addr, int size)** :<br/>
         This system call is called from parent process to report memory which are going to be shared.<br/>
-        @*param name* - unique name for the shared memory.<br/>
-        @*param addr* - address of the shared memory.<br/>
+        @*param \*name* - unique name for the shared memory.<br/>
+        @*param \*addr* - address of the shared memory.<br/>
         @*param size* - size of the shared memory.<br/>
         Returnig value is: 0\~9 if sharing went successfull, -1 - if any of parametars is wrong, -2 - shared structure with a 'name' already exist, -3 - if exist more than 10 shared structures.<br/><br/>
 
     -   **int get_shared(char \*name, void \*\*addr)** :<br/>
         This system call is called from child procces to access shared structure.<br/>
-        @*param name* - name of the shared structure which child process want to access.<br/>
+        @*param \*name* - name of the shared structure which child process want to access.<br/>
         @*param \*\*addr* - pointer (passed by reference) which needs to point on shared memory after system call is over.<br/>
         Returning value is: 0 - if calls went successful, -1 - if any of parametars is wrong, -2 - if there is no shared structure named with 'name'.<br/><br/>
 
