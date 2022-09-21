@@ -1,14 +1,14 @@
 # xv6 Operating System
 ## Adding interprocess communication
 
-Xv6 modified to support communication between processes. Processes communicate through the shared memory and it's resticted only to a parent-child relation.<br/>
+Xv6 modified to support communication between processes. Processes communicate through the shared memory and it's resticted only to a parent-child relation.<br/><br/>
 In this particular example i've made three processes one **primestart** which is parent process, and other two **primecom** and **primecalc** which are childs processes. Process primestart creates structures which will be shared among other two processes and report it to the operating system. Primecom receives commands from the user and pushes command id on the shared memory. Primecal calculates prime numbers and writes them on the shared memory, and also reads and executes commands pushed by primecom.<br/>
 
-Here is more detaild explanation of the problem and how i've solved it.<br/><br/>
+Here is more detaild explanation of the problem and how i've solved it.<br/>
 
-Parent process needs to notify operating system which memory addresses are going to be shared, and all parent's children should be given by operating system the same physical addresses in their virtual memory space.<br/><br/>
+Parent process needs to notify operating system which memory addresses are going to be shared, and all parent's children should be given by operating system the same physical addresses in their virtual memory space.<br/>
 
-In order to make sharing memory possible, i've made new structure called **shared** which contains metadata of the memory parts which are intended to be shared.<br/>Also i've added two additional attributes in the **proc** structure, the first is the pointer to the **parent page directory** and the second is the **array of the shared structures**.<br/><br/>
+In order to make sharing memory possible, i've made new structure called **shared** which contains metadata of the memory parts which are intended to be shared.<br/>Also i've added two additional attributes in the **proc** structure: pointer to the **parent page directory** and the **array of the shared structures**.<br/>
 
 The system changes i've made to support process communication functionality are:<br/>
 
@@ -17,7 +17,6 @@ The system changes i've made to support process communication functionality are:
 
 2.  **exec() modification**:<br/>
     I've restricted regular process size to be maximum 1GB. Starting at 1GB up to the 2GB are mapped physical addresses of the shared memory inherited from the parent. At this point communication between child and parent is possible, because the real physical address of the parent's shared memory are mapped in the child virtual memory starting at 1GB up to the 2GB.<br/><br/>
-
 
 Additional changes to the xv6 OS:<br/>
 
@@ -28,7 +27,7 @@ Additional changes to the xv6 OS:<br/>
         @*param \*name* - unique name for the shared memory.<br/>
         @*param \*addr* - address of the shared memory.<br/>
         @*param size* - size of the shared memory.<br/>
-        Returnig value is: 0\~9 if sharing went successfull, -1 - if any of parametars is wrong, -2 - shared structure with a 'name' already exist, -3 - if exist more than 10 shared structures.<br/><br/>
+        Returnig value is: 0\~9 if sharing went successfull, -1 - if any of parametars is wrong, -2 - shared structure with a 'name' already exist, -3 - if exist more than 10 shared structures.<br/>
 
     -   **int get_shared(char \*name, void \*\*addr)** :<br/>
         This system call is called from child procces to access shared structure.<br/>
@@ -55,5 +54,5 @@ Additional changes to the xv6 OS:<br/>
             - **end** - notifies **primecalc** to exit process, and shut down himself.<br/>
 
     -   **primecalc** :<br/>
-        This program calculates prime numbers. When prime number is found, he writes number in the shared array and also increments position counter of the array. Also this program checks whether the some command is sent by the **primecom** program.<br/><br/>
+        This program calculates prime numbers. When prime number is found, he writes number in the shared array and also increments position counter of the array. Also this program checks whether the some command is sent by the **primecom** program.<br/>
 
