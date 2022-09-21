@@ -1,7 +1,11 @@
 # xv6 Operating System
 ## Adding interprocess communication
 
-Xv6 modified to support comunication between processes. Processes communicate through the shared memory and it's resticted only to a parent-child relation.<br/>
+Xv6 modified to support communication between processes. Processes communicate through the shared memory and it's resticted only to a parent-child relation.<br/>
+In this particular example i've made three processes one **primestart** which is parent process, and other two **primecom** and **primecalc** which are childs processes. Process primestart creates structures which will be shared among other two processes and report it to the operating system. Primecom receives commands from the user and pushes command id on the shared memory. Primecal calculates prime numbers and writes them on the shared memory, and also reads and executes commands pushed by primecom.<br/>
+
+Here is more detaild explanation of the problem and how i've solved it.<br/><br/>
+
 Parent process needs to notify operating system which memory addresses are going to be shared, and all parent's children should be given by operating system the same physical addresses in their virtual memory space.<br/><br/>
 
 In order to make sharing memory possible, i've made new structure called **shared** which contains metadata of the memory parts which are intended to be shared.<br/>Also i've added two additional attributes in the **proc** structure, the first is the pointer to the **parent page directory** and the second is the **array of the shared structures**.<br/><br/>
