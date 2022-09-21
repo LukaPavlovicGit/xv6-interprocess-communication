@@ -39,7 +39,7 @@ Additional changes to the xv6 OS:<br/>
         That ctructure are:<br/>
             - empty array sized of 400000 bytes (type of int).<br/>
             - counter of the position in the array (type of int)<br/>
-            - command indicator (type of int)<br/><br/>
+            - command indicator (type of int)<br/>
 
     -   **primecom** :<br/>
         This program receives commands from the user.<br/>
@@ -48,7 +48,7 @@ Additional changes to the xv6 OS:<br/>
             - **latest** - prints latest calculated prime number.<br/>
             - **pause** - pause calculation of prime numbers.<br/>
             - **resume** - resume calculation of prime numbers.<br/>
-            - **end** - notifies **primecalc** to exit process, and shut down himself.<br/><
+            - **end** - notifies **primecalc** to exit process, and shut down himself.<br/>
 
     -   **primecalc** :<br/>
         This program calculates prime numbers. When prime number is found, he writes number in the shared array and also increments position counter of the array. Also this program checks whether the some command is sent by the **primecom** program.<br/><br/>
