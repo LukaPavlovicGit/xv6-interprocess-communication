@@ -1,7 +1,7 @@
 # xv6 Operating System
 ## Adding interprocess communication
 
-Xv6 modified to support comunication between proceses. Processes communicate through the shared memory and it's resticted only to a parent-child relation.<br/>
+Xv6 modified to support comunication between processes. Processes communicate through the shared memory and it's resticted only to a parent-child relation.<br/>
 Parent process needs to notify operating system which memory addresses are going to be shared, and all parent's children should be given by operating system the same physical addresses in their virtual memory space.<br/><br/>
 
 In order to make sharing memory possible, i've made new structure called **shared** which contains metadata of the memory parts which are intended to be shared.<br/>Also i've added two additional attributes in the **proc** structure, the first is the pointer to the **parent page directory** and the second is the **array of the shared structures**.<br/><br/>
@@ -37,10 +37,10 @@ Additional changes to the xv6 OS:<br/>
     -   **primestart** :<br/>
         This program prepares structrures which are going to be shared with it's children.<br/>
         That ctructure are:<br/>
-            - empty array sized of 400000 bytes (type of int).
-            - counter of the position in the array (type of int)
-            - command indicator (type of int)
-<br/>
+            - empty array sized of 400000 bytes (type of int).<br/>
+            - counter of the position in the array (type of int)<br/>
+            - command indicator (type of int)<br/><br/>
+
     -   **primecom** :<br/>
         This program receives commands from the user.<br/>
         Possible commands are:<br/>
