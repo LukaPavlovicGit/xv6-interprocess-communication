@@ -1,4 +1,7 @@
 # xv6 Operating System
+
+## [Official project specification](OS-Domaći3.pdf)
+
 ## Adding interprocess communication
 
 Xv6 modified to support communication between processes. Processes communicate through the shared memory and it's resticted only to a parent-child relation.<br/><br/>
