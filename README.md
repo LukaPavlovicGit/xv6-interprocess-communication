@@ -4,8 +4,7 @@
 
 ## Adding process communication support
 
-Xv6 has been modified to support communication between processes. Processes communicate using shared memory, which is limited to only one parent-child relationship.<br/>
-In this example I have created three processes, one **primestart** which is the parent process, and two others **primecom** and **primecalc** which are child processes. The primestart process creates structures that are shared by the other two processes and reports them to the operating system. Primecom receives commands from the user and pushes the command ID into shared memory. Primecal computes prime numbers and writes them to shared memory. It also reads the commands sent by primecom and executes them.<br/>
+Xv6 has been modified to support communication between processes. Processes communicate using shared memory, which is limited to only one parent-child relationship. In this example I have created three processes, one **primestart** which is the parent process, and two others **primecom** and **primecalc** which are child processes. The primestart process creates structures that are shared by the other two processes and reports them to the operating system. Primecom receives commands from the user and pushes the command ID into shared memory. Primecal computes prime numbers and writes them to shared memory. It also reads the commands sent by primecom and executes them.<br/>
 
 Here is a more detailed explanation of the problem and how I solved it.<br/>
 
