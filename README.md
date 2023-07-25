@@ -1,8 +1,8 @@
-# xv6 Operating System
+# [video demonstration](https://drive.google.com/file/d/1XphjlcFuXzx-v_BjJrwVY3OILzRrkXUP/view?usp=drive_link)
 
-## [project specification](OS-Domaći3.pdf)
+# [project specification](OS-Domaći3.pdf)
 
-## Adding process communication support
+# Adding process communication support to XV6 Operating System
 
 Xv6 has been modified to support communication between processes. Processes communicate using shared memory, which is limited to only one parent-child relationship. In this example I have created three processes, one **primestart** which is the parent process, and two others **primecom** and **primecalc** which are child processes. The primestart process creates structures that are shared by the other two processes and reports them to the operating system. Primecom receives commands from the user and pushes the command ID into shared memory. Primecal computes prime numbers and writes them to shared memory. It also reads the commands sent by primecom and executes them.<br/>
 
