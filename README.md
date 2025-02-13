@@ -1,59 +1,78 @@
-# [video demonstration](https://drive.google.com/file/d/1XphjlcFuXzx-v_BjJrwVY3OILzRrkXUP/view?usp=drive_link)
+# Adding Process Communication Support to the XV6 Operating System
 
-# [project specification](OS-Domaći3.pdf)
+# [Video Demonstration](https://drive.google.com/file/d/1XphjlcFuXzx-v_BjJrwVY3OILzRrkXUP/view?usp=drive_link)
+# [Project Specification](OS-Domaći3.pdf)
 
-# Adding process communication support to XV6 Operating System
+Xv6 has been modified to enable interprocess communication (IPC) using shared memory, restricted to a single parent-child relationship. In this example, there are three processes:
+- **primestart** (the parent process)
+- **primecom** (child process)
+- **primecalc** (child process)
 
-Xv6 has been modified to support communication between processes. Processes communicate using shared memory, which is limited to only one parent-child relationship. In this example I have created three processes, one **primestart** which is the parent process, and two others **primecom** and **primecalc** which are child processes. The primestart process creates structures that are shared by the other two processes and reports them to the operating system. Primecom receives commands from the user and pushes the command ID into shared memory. Primecal computes prime numbers and writes them to shared memory. It also reads the commands sent by primecom and executes them.<br/>
+The **primestart** process creates and registers the shared memory structures with the operating system. **primecom** receives commands from the user, places their command ID in the shared memory, and **primecalc** computes prime numbers and writes them to the shared memory. Additionally, **primecalc** reads and executes commands sent by **primecom**.
 
-Here is a more detailed explanation of the problem and how I solved it.<br/>
+Below is a more detailed explanation of the problem and how it was solved.
 
-The parent process must tell the operating system which memory addresses to share, and all child processes should be given the same physical addresses in their virtual memory space by the operating system.<br/>
+---
 
-To enable memory sharing, I created a new structure called **shared** that contains metadata about the parts of memory to be shared, and added two additional attributes to the **proc** structure: Pointer to the **parent page directory** and the **array of shared structures**.<br/>
+## Overview
 
-The system changes I made to support process communication functionality are:<br/>
+The parent process must inform the operating system which memory regions should be shared. The operating system must then ensure each child process receives the same physical addresses mapped into its virtual memory space.
 
-1.  **fork() modification**:<br/>
-    When the system call fork is invoked, the new process should inherit all common structures from its parent. At this point, the child has only one copy of the shared memory. This means that the child cannot yet communicate with its parent.<br/>
+To enable memory sharing, a new structure called **shared** was created to hold metadata about the memory to be shared. Two additional attributes were also added to the **proc** structure:
+1. A pointer to the **parent page directory**  
+2. An **array of shared structures**
 
-2.  **exec() modification**:<br/>
-    I have limited the regular process size to a maximum of 1 GB. From 1 GB up to 2 GB, the physical addresses of the shared memory inherited from the parent are allocated. At this point, communication between child and parent is possible because the real physical addresses of the parent's shared memory are mapped in the child's virtual memory from 1 GB up to 2 GB.<br/><br/>
+---
 
-Additional changes to the xv6 OS:<br/>
+## System Changes
 
-1. Two system calls :<br/>
-    
-    -   **int share_mem(char \*name, void \*addr, int size)** :<br/>
-        This system call is invoked by the parent process to report memory to be shared.<br/>
-        @*param \*name* - unique name for the shared memory.<br/>
-        @*param \*addr* - address of the shared memory.<br/>
-        @*param size* - size of the shared memory.<br/>
-        Returnig value is: 0\~9 if share went successfully, -1 - if any of parametars is wrong, -2 - shared structure with a 'name' already exist, -3 - if exist more than 10 shared structures.<br/>
+1. **`fork()` Modification**  
+   When the `fork()` system call is invoked, the new (child) process inherits all common structures from its parent. At this stage, the child has only a single copy of the shared memory, which means the child cannot yet communicate with its parent.
 
-    -   **int get_shared(char \*name, void \*\*addr)** :<br/>
-        This system call is invoked by child processes to access a common structure.<br/>
-        @*param \*name* - name of the shared structure which child process want to access.<br/>
-        @*param \*\*addr* - pointer (passed by reference) which needs to point on shared memory after system call is over.<br/>
-        Returning value is: 0 - if calls went successful, -1 - if any of parametars is wrong, -2 - if there is no shared structure named with 'name'.<br/><br/>
+2. **`exec()` Modification**  
+   The regular process size is limited to a maximum of 1 GB. From 1 GB to 2 GB, physical addresses of the shared memory inherited from the parent are allocated. At this point, communication between child and parent becomes possible because the parent’s physical shared memory addresses are mapped into the child’s virtual address space within the 1 GB to 2 GB range.
 
-2. Three user programs:<br/>
+---
 
-    -   **primestart** :<br/>
-        This program prepares structures to be passed on to its children..<br/>
-        That structures are:<br/>
-            - empty array sized of 400000 bytes (type of int).<br/>
-            - counter of the position in the array (type of int)<br/>
-            - command indicator (type of int)<br/>
+## Additional Changes to XV6
 
-    -   **primecom** :<br/>
-        This program receives commands from the user.<br/>
-        Possible commands are:<br/>
-            - **prime \<n\>** - prints n-th prime number. If n-th number is not calculated error is thrown.<br/>
-            - **latest** - prints latest calculated prime number.<br/>
-            - **pause** - pause calculation of prime numbers.<br/>
-            - **resume** - resume calculation of prime numbers.<br/>
-            - **end** - notifies **primecalc** to exit process, and shut down himself.<br/>
+1. **Two System Calls**
 
-    -   **primecalc** :<br/>
-        This program calculates prime numbers. When a prime number is found, it writes the number to the common array and also increments the position counter of the array. Also, this program checks if the command some was sent by the program **primecom**.
+   - **`int share_mem(char *name, void *addr, int size)`**  
+     This system call is invoked by the parent process to register a shared memory region.  
+     - **`name`**: Unique identifier for the shared memory.  
+     - **`addr`**: Address of the shared memory.  
+     - **`size`**: Size of the shared memory region (in bytes).  
+     - **Return value**:  
+       - `0~9` if sharing succeeds,  
+       - `-1` if any parameter is invalid,  
+       - `-2` if a shared structure with the same name already exists,  
+       - `-3` if there are more than 10 shared structures.
+
+   - **`int get_shared(char *name, void **addr)`**  
+     This system call is invoked by child processes to access a shared memory region.  
+     - **`name`**: Name of the shared memory region the child wants to access.  
+     - **`addr`**: A pointer (passed by reference) which should point to the shared memory region after the call completes.  
+     - **Return value**:  
+       - `0` if the call succeeds,  
+       - `-1` if any parameter is invalid,  
+       - `-2` if no shared structure with the given name exists.
+
+2. **Three User Programs**
+
+   - **`primestart`**  
+     This program prepares the shared structures to pass to its children. The structures include:  
+       - An empty array of 400,000 bytes (used as `int` array).  
+       - A counter (an `int`) indicating the current position in the array.  
+       - A command indicator (an `int`) used to signal commands.
+
+   - **`primecom`**  
+     This program receives commands from the user. Possible commands include:  
+       - **`prime <n>`**: Prints the *n*-th prime number. If the *n*-th prime is not yet calculated, an error message is displayed.  
+       - **`latest`**: Prints the most recently calculated prime number.  
+       - **`pause`**: Pauses prime number calculation.  
+       - **`resume`**: Resumes prime number calculation.  
+       - **`end`**: Notifies **primecalc** to terminate, then ends its own execution.
+
+   - **`primecalc`**  
+     This program calculates prime numbers. When it finds a new prime, it writes it to the shared array and increments the array position counter. **primecalc** also monitors for commands from **primecom**, and executes them as needed.
